@@ -68,9 +68,54 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | Some u => u
       end.
 
-    Fixpoint put t key val := à définir 
-    Fixpoint get t key val := à définir 
-    Fixpoint member t key := à définir
+    Fixpoint put t key val :=
+      match key with
+        | []    => failwith "Cle vide"
+        | e::[] =>
+            match t e with
+              | Leaf _   => Leaf (Some val)
+              | Node _ r => Node (Some val, r)
+            end
+        | e::l  =>
+            match t e with
+              | Leaf x   => Node x (fun c -> if A.eq e c then Leaf (Some val) else Leaf None)
+              | Node x r => (* TODO *)
+            end
+      end.
+
+    Fixpoint get t key val :=
+      match key with
+        | []    => failwith "Cle vide"
+        | e::[] =>
+            match t e with
+              | Leaf None
+              | Node None _     => val
+              | Leaf (Some x)
+              | Node (Some x) _ => x
+            end
+        | e::l  =>
+            match t e with
+              | Leaf _   => val
+              | Node _ r => get (r e) l
+            end
+      end.
+
+    Fixpoint member t key :=
+      match key with
+        | []    => failwith "Cle vide"
+        | e::[] =>
+            match t e with
+              | Leaf None
+              | Node None _     => false
+              | Leaf (Some _)
+              | Node (Some _) _ => true
+            end
+        | e::l  =>
+            match t e with
+              | Leaf _   => false
+              | Node _ r => member (r e) l
+            end
+      end.
 
     Theorem get_empty: forall key def, get empty key def = def.
     Admitted.
