@@ -4,6 +4,7 @@ Require Import Bool.
 Require Import List.
 Import ListNotations.
 Set Implicit Arguments.
+
 (* Ecriture de la spécification *)
 
 Module Type TABLE.
@@ -23,13 +24,19 @@ Axiom mem_put_eq: forall key val t, member (put t key val) key = true.
 Axiom mem_put_neq: forall key1 key2 val t,
 key1<>key2 -> member (put t key1 val) key2 = member t key2.
 End TABLE.
+
 Require Import Ascii. (* pour utiliser des caractères *)
 Module Test(T:TABLE with Definition Key:=list ascii with Definition Val:=nat).
   Local Open Scope char_scope. (* pour pouvoir écrire "a" *)
-  Definition test := 
+  Definition test (k: T.Key) (v:T.Val) := 
     let t1 := T.empty in
-
+    let t2 := T.put t1 k v in
+    if T.member t2 k then 
+      T.get t2 k v 
+    else 
+      let t2 := T.put t2 k v in v.
 End Test.
+
 (* Implémentation de la spécification *)
 
 
