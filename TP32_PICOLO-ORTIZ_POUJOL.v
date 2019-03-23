@@ -72,12 +72,12 @@ Module Trie (A:ALPHA) (T:TYPE) <:
       match key with
         | []    => failwith "Cle vide"
         | e::[] =>
-            match t e with
+            match t with
               | Leaf _   => Leaf (Some val)
               | Node _ r => Node (Some val, r)
             end
         | e::l  =>
-            match t e with
+            match t with
               | Leaf x   => Node x (fun c -> if A.eq e c then Leaf (Some val) else Leaf None)
               | Node x r => (* TODO *)
             end
@@ -87,14 +87,14 @@ Module Trie (A:ALPHA) (T:TYPE) <:
       match key with
         | []    => failwith "Cle vide"
         | e::[] =>
-            match t e with
+            match t with
               | Leaf None
               | Node None _     => val
               | Leaf (Some x)
               | Node (Some x) _ => x
             end
         | e::l  =>
-            match t e with
+            match t with
               | Leaf _   => val
               | Node _ r => get (r e) l
             end
@@ -104,14 +104,14 @@ Module Trie (A:ALPHA) (T:TYPE) <:
       match key with
         | []    => failwith "Cle vide"
         | e::[] =>
-            match t e with
+            match t with
               | Leaf None
               | Node None _     => false
               | Leaf (Some _)
               | Node (Some _) _ => true
             end
         | e::l  =>
-            match t e with
+            match t with
               | Leaf _   => false
               | Node _ r => member (r e) l
             end
