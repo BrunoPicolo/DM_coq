@@ -1,4 +1,4 @@
-(* Bruno PICOLO ORTIZ Elyan POUJOL *)
+ (* Bruno PICOLO ORTIZ Elyan POUJOL *)
 
 Require Import Bool.
 Require Import List.
@@ -70,22 +70,26 @@ Module Trie (A:ALPHA) (T:TYPE) <:
 
     Fixpoint put t key val :=
       match key with
-        | []    => failwith "Cle vide"
+        | []    => t (* cle vide, on retourne l'arbre *)
         | e::[] =>
             match t with
               | Leaf _   => Leaf (Some val)
-              | Node _ r => Node (Some val, r)
+              | Node _ r => Node (Some val) r
             end
         | e::l  =>
             match t with
-              | Leaf x   => Node x (fun c -> if A.eq e c then Leaf (Some val) else Leaf None)
-              | Node x r => (* TODO *)
+              | Leaf x   =>
+                  let t' := put (Leaf None) l val in
+                  Node x (fun c => if A.eq e c then t' else Leaf None)
+              | Node x r =>
+                  let t' := put (r e) l val in
+                  Node x (fun c => if A.eq e c then t' else r c)
             end
       end.
 
     Fixpoint get t key val :=
       match key with
-        | []    => failwith "Cle vide"
+        | []    => val (* cle vide, on retourne la valeur alternative *)
         | e::[] =>
             match t with
               | Leaf None
@@ -96,13 +100,13 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | e::l  =>
             match t with
               | Leaf _   => val
-              | Node _ r => get (r e) l
+              | Node _ r => get (r e) l val
             end
       end.
 
     Fixpoint member t key :=
       match key with
-        | []    => failwith "Cle vide"
+        | []    => false (* cle vide, rien n'est contenu dans la racine *)
         | e::[] =>
             match t with
               | Leaf None
@@ -131,7 +135,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     Theorem mem_put_neq: forall key1 key2 val t,
       key1<>key2 -> member (put t key1 val) key2 = member t key2.
     Admitted.
-End trie.
+End Trie.
 
 Inductive option T :=
   Some (valeur:T)
