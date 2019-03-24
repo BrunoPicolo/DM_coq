@@ -28,13 +28,9 @@ End TABLE.
 Require Import Ascii. (* pour utiliser des caractères *)
 Module Test(T:TABLE with Definition Key:=list ascii with Definition Val:=nat).
   Local Open Scope char_scope. (* pour pouvoir écrire "a" *)
-  Definition test (k: T.Key) (v:T.Val) := 
-    let t1 := T.empty in
-    let t2 := T.put t1 k v in
-    if T.member t2 k then 
-      T.get t2 k v 
-    else 
-      let t2 := T.put t2 k v in v.
+  Definition test (k: T.Key) (v: T.Val) :=
+    let t := T.put T.empty k v in
+    T.get t k v.
 End Test.
 
 (* Implémentation de la spécification *)
@@ -123,15 +119,20 @@ Module Trie (A:ALPHA) (T:TYPE) <:
 
     Theorem get_empty: forall key def, get empty key def = def.
     Admitted.
+
     Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
     Admitted.
+
     Theorem get_put_neq: forall key1 key2 val def t,
     key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
     Admitted.
+
     Theorem empty_mem: forall key, member empty key = false.
     Admitted.
+
     Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
     Admitted.
+
     Theorem mem_put_neq: forall key1 key2 val t,
       key1<>key2 -> member (put t key1 val) key2 = member t key2.
     Admitted.
@@ -140,4 +141,20 @@ End Trie.
 Inductive option T :=
   Some (valeur:T)
   | None.
+
+
+Module StrK.
+  Definition lettre := ascii.
+  Definition eq := ascii_dec.
+End StrK.
+
+Module NatV.
+  Definition t := nat.
+End NatV.
+
+Module TrieStrNat := Trie StrK NatV.
+Module TestTrieStrNat := Test TrieStrNat.
+
+Open Scope char_scope.
+Eval compute in TestTrieStrNat.test ["a"; "b"; "c"] 10.
 
