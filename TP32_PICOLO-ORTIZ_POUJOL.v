@@ -79,7 +79,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | e::l  =>
             match t with
               | Leaf x   => Node x (fun c -> if A.eq e c then Leaf (Some val) else Leaf None)
-              | Node x r => (* TODO *)
+              | Node x r => if A.eq e x then put r l (Somme val) else 
             end
       end.
 
