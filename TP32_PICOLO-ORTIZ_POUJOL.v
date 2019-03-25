@@ -117,25 +117,36 @@ Module Trie (A:ALPHA) (T:TYPE) <:
             end
       end.
 
+    Theorem empty_mem: forall key, member empty key = false.
+    destruct key; try tauto.
+    simpl.
+    destruct key; try tauto.
+    Qed.
+
     Theorem get_empty: forall key def, get empty key def = def.
+    destruct key; try tauto.
+    simpl.
+    destruct key; try tauto.
+    Qed.
+
+    Theorem mem_put_neq: forall key1 key2 val t,
+      key1<>key2 -> member (put t key1 val) key2 = member t key2.
     Admitted.
 
     Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
+    destruct key; try tauto.
+    simpl.
+    destruct t; try tauto.
+    simpl.
     Admitted.
 
     Theorem get_put_neq: forall key1 key2 val def t,
     key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
     Admitted.
 
-    Theorem empty_mem: forall key, member empty key = false.
-    Admitted.
-
     Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
     Admitted.
 
-    Theorem mem_put_neq: forall key1 key2 val t,
-      key1<>key2 -> member (put t key1 val) key2 = member t key2.
-    Admitted.
 End Trie.
 
 Inductive option T :=
