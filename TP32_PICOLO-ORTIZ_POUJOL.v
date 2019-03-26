@@ -131,20 +131,26 @@ Module Trie (A:ALPHA) (T:TYPE) <:
 
     Theorem mem_put_neq: forall key1 key2 val t,
       key1<>key2 -> member (put t key1 val) key2 = member t key2.
+    induction key1.
+    destruct key2; try tauto.
+    intros.
     Admitted.
 
     Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
-    destruct key; try tauto.
-    simpl.
-    destruct t; try tauto.
-    simpl.
+    induction key.
+    destruct t.
     Admitted.
 
     Theorem get_put_neq: forall key1 key2 val def t,
     key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
+    induction key1.
+    destruct t. destruct key2.
+    auto.
     Admitted.
 
     Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
+    induction key.
+    destruct t; try tauto.
     Admitted.
 
 End Trie.
