@@ -28,9 +28,12 @@ End TABLE.
 Require Import Ascii. (* pour utiliser des caractères *)
 Module Test(T:TABLE with Definition Key:=list ascii with Definition Val:=nat).
   Local Open Scope char_scope. (* pour pouvoir écrire "a" *)
-  Definition test (k: T.Key) (v: T.Val) :=
-    let t := T.put T.empty k v in
-    T.get t k v.
+  Definition test :=
+    let t := T.put T.empty ["a"; "b"; "c"] 10 in
+    if T.member t ["a"; "b"; "c"] then
+      T.get t ["a"; "b"; "c"] 0
+    else
+      0.
 End Test.
 
 (* Implémentation de la spécification *)
@@ -188,10 +191,4 @@ End NatV.
 Module TrieStrNat := Trie StrK NatV.
 Module TestTrieStrNat := Test TrieStrNat.
 
-Open Scope char_scope.
-Eval compute in TestTrieStrNat.test ["a"; "b"; "c"] 10.
-
-Eval compute in let t := TrieStrNat.put TrieStrNat.empty ["a"; "b"; "c"] 10 in
-                TrieStrNat.member t ["a"; "b"; "c"].
-(*                 TrieStrNat.get t ["a"; "b"; "c"] 100. *)
-
+Eval compute in TestTrieStrNat.test.
