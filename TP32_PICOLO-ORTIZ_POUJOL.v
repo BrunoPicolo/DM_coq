@@ -69,8 +69,8 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | []    => t (* cle vide, on retourne l'arbre *)
         | e::[] =>
             match t with
-              | Leaf _   => Leaf (Some val)
-              | Node _ r => Node (Some val) r
+              | Leaf x   => Node x (fun c => if A.eq e c then Leaf (Some val) else Leaf None)
+              | Node x r => Node x (fun c => if A.eq e c then Leaf (Some val) else r c)
             end
         | e::l  =>
             match t with
@@ -88,10 +88,14 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | []    => val (* cle vide, on retourne la valeur alternative *)
         | e::[] =>
             match t with
-              | Leaf None
-              | Node None _     => val
-              | Leaf (Some x)
-              | Node (Some x) _ => x
+              | Leaf _ => val
+              | Node _ r =>
+                  match r e with
+                    | Leaf (Some x)
+                    | Node (Some x) _ => x
+                    | Leaf None
+                    | Node None _     => val
+                  end
             end
         | e::l  =>
             match t with
@@ -105,10 +109,14 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | []    => false (* cle vide, rien n'est contenu dans la racine *)
         | e::[] =>
             match t with
-              | Leaf None
-              | Node None _     => false
-              | Leaf (Some _)
-              | Node (Some _) _ => true
+              | Leaf _ => false
+              | Node _ r =>
+                  match r e with
+                    | Leaf (Some x)
+                    | Node (Some x) _ => true
+                    | Leaf None
+                    | Node None _     => false
+                  end
             end
         | e::l  =>
             match t with
@@ -182,4 +190,8 @@ Module TestTrieStrNat := Test TrieStrNat.
 
 Open Scope char_scope.
 Eval compute in TestTrieStrNat.test ["a"; "b"; "c"] 10.
+
+Eval compute in let t := TrieStrNat.put TrieStrNat.empty ["a"; "b"; "c"] 10 in
+                TrieStrNat.member t ["a"; "b"; "c"].
+(*                 TrieStrNat.get t ["a"; "b"; "c"] 100. *)
 
