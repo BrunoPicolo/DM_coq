@@ -107,7 +107,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
             end
       end.
 
-    Fixpoint member t key :=
+(*  Fixpoint member t key :=
       match key with
         | []    => false (* cle vide, rien n'est contenu dans la racine *)
         | e::[] =>
@@ -126,6 +126,22 @@ Module Trie (A:ALPHA) (T:TYPE) <:
               | Leaf _   => false
               | Node _ r => member (r e) l
             end
+      end. *)
+
+    Fixpoint member t key :=
+      match key, t with
+        | _, Leaf None => false
+        | [], _ => true
+        | e::[], Leaf _   => false
+        | e::[], Node _ r =>
+            match r e with
+              | Leaf (Some x)
+              | Node (Some x) _ => true
+              | Leaf None
+              | Node None _     => false
+            end
+        | e::l, Leaf _   => false
+        | e::l, Node _ r => member (r e) l
       end.
 
     Theorem empty_mem: forall key, member empty key = false.
@@ -144,8 +160,10 @@ Module Trie (A:ALPHA) (T:TYPE) <:
       key1<>key2 -> member (put t key1 val) key2 = member t key2.
     induction key1.
     simpl.
-    reflexivity.
+    (*reflexivity.*)
     destruct key2; try tauto.
+    destruct t.
+    destruct val0.
     
     Admitted.
 
@@ -184,7 +202,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
 End Trie.
 
 Inductive option T :=
-  Some (valeur:T)
+  Some (valeur: T)
   | None.
 
 
