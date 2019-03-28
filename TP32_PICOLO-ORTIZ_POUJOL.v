@@ -161,17 +161,15 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
     Proof.
     induction key1.
-    destruct key2; try tauto.
-    intros.
-    destruct t; try tauto.
+    destruct key2.
     Admitted.
     
     Lemma put_empty_key: forall val t, put t [] val = t.
     Proof.
     auto.
     Qed.
+
     Lemma mem_empty_key: forall t, member t [] = true.
-    Proof.
     Admitted.
     
     Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
@@ -179,6 +177,8 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     intros.
     simpl.
     apply mem_empty_key.
+    destruct t; try tauto.
+    simpl.
     Admitted.
 
 End Trie.
