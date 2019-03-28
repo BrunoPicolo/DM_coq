@@ -69,7 +69,11 @@ Module Trie (A:ALPHA) (T:TYPE) <:
 
     Fixpoint put t key val :=
       match key with
-        | []    => t (* cle vide, on retourne l'arbre *)
+        | []    =>
+            match t with
+              | Leaf _ => Leaf (Some val)
+              | Node _ r => Node (Some val) r
+            end
         | e::[] =>
             match t with
               | Leaf x   => Node x (fun c => if A.eq e c then Leaf (Some val) else Leaf None)
@@ -107,40 +111,18 @@ Module Trie (A:ALPHA) (T:TYPE) <:
             end
       end.
 
-(*  Fixpoint member t key :=
-      match key with
-        | []    => false (* cle vide, rien n'est contenu dans la racine *)
-        | e::[] =>
-            match t with
-              | Leaf _ => false
-              | Node _ r =>
-                  match r e with
-                    | Leaf (Some x)
-                    | Node (Some x) _ => true
-                    | Leaf None
-                    | Node None _     => false
-                  end
-            end
-        | e::l  =>
-            match t with
-              | Leaf _   => false
-              | Node _ r => member (r e) l
-            end
-      end. *)
-
     Fixpoint member t key :=
       match key, t with
-        | _, Leaf None => false
-        | [], _ => true
-        | e::[], Leaf _   => false
+        | [], Leaf (Some _) => true
+        | _, Leaf _ => false
+        | [], Node (Some _) _ => true
+        | [], Node None _     => false
         | e::[], Node _ r =>
             match r e with
               | Leaf (Some x)
               | Node (Some x) _ => true
-              | Leaf None
-              | Node None _     => false
+              | _               => false
             end
-        | e::l, Leaf _   => false
         | e::l, Node _ r => member (r e) l
       end.
 
@@ -149,6 +131,28 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     simpl.
     destruct key; try tauto.
     Qed.
+
+    (* Lemma put_empty_key: forall val t, put t [] val = t.
+    Proof.
+    auto.
+    Qed. *)
+
+    
+    Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
+    induction key.
+    destruct t.
+    try tauto.
+    auto.
+    destruct (A.eq a a).
+    rewrite e.
+    destruct val0.
+    auto.
+    intros.
+    simpl.
+    apply mem_empty_key.
+    destruct t; try tauto.
+    simpl.
+    Admitted.
 
     Theorem get_empty: forall key def, get empty key def = def.
     destruct key; try tauto.
@@ -180,23 +184,6 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     Proof.
     induction key1.
     destruct key2.
-    Admitted.
-    
-    Lemma put_empty_key: forall val t, put t [] val = t.
-    Proof.
-    auto.
-    Qed.
-
-    Lemma mem_empty_key: forall t, member t [] = true.
-    Admitted.
-    
-    Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
-    induction key.
-    intros.
-    simpl.
-    apply mem_empty_key.
-    destruct t; try tauto.
-    simpl.
     Admitted.
 
 End Trie.
