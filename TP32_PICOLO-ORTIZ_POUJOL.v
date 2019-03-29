@@ -67,6 +67,13 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | Some u => u
       end.
 
+(* Fixpoint put t key val :=
+match t with 
+| Leaf _   => 
+    match key with
+    | [] => Leaf (Somme val)
+| Node x r => *)
+
     Fixpoint put t key val :=
       match key with
         | []    =>
@@ -127,6 +134,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
       end.
 
     Theorem empty_mem: forall key, member empty key = false.
+    Proof.
     destruct key; try tauto.
     simpl.
     destruct key; try tauto.
@@ -137,46 +145,37 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     auto.
     Qed. *)
 
-    
     Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
+    Proof.
     induction key.
-    destruct t.
-    try tauto.
-    auto.
-    destruct (A.eq a a).
-    rewrite e.
-    destruct val0.
-    auto.
-    intros.
-    simpl.
-    apply mem_empty_key.
     destruct t; try tauto.
-    simpl.
+    destruct (A.eq a a).
     Admitted.
 
     Theorem get_empty: forall key def, get empty key def = def.
     destruct key; try tauto.
-    simpl.
     destruct key; try tauto.
     Qed.
 
     Theorem mem_put_neq: forall key1 key2 val t,
       key1<>key2 -> member (put t key1 val) key2 = member t key2.
     induction key1.
-    simpl.
-    (*reflexivity.*)
     destruct key2; try tauto.
     destruct t.
     destruct val0.
-    
+    reflexivity.
+    reflexivity.
+    reflexivity.
+    destruct (A.eq a a).
     Admitted.
 
     Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
-    induction key.
-    simpl.
-    destruct t; try tauto.
-    simpl.
-    
+    Proof.
+    induction key. 
+    destruct t.    
+    simpl. 
+    (*Destruction de l'égalité*)
+    (*utiliser rewrite*)
     Admitted.
 
     Theorem get_put_neq: forall key1 key2 val def t,
