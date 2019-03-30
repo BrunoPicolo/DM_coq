@@ -99,7 +99,13 @@ match t with
 
     Fixpoint get t key val :=
       match key with
-        | []    => val (* cle vide, on retourne la valeur alternative *)
+        | []    =>
+            match t with
+              | Leaf (Some x)
+              | Node (Some x) _ => x
+              | Leaf None
+              | Node None _     => val
+            end
         | e::[] =>
             match t with
               | Leaf _ => val
@@ -153,6 +159,7 @@ match t with
     Admitted.
 
     Theorem get_empty: forall key def, get empty key def = def.
+    Proof.
     destruct key; try tauto.
     destruct key; try tauto.
     Qed.
@@ -171,9 +178,12 @@ match t with
 
     Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
     Proof.
-    induction key. 
-    destruct t.    
-    simpl. 
+    induction key.
+    destruct t.
+    simpl.
+    reflexivity.
+    simpl.
+    reflexivity.
     (*Destruction de l'égalité*)
     (*utiliser rewrite*)
     Admitted.
