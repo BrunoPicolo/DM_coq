@@ -67,29 +67,37 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | Some u => u
       end.
 
-Fixpoint put t key val := 
-match t with 
-Leaf v => match key with 
-  [] => Leaf (Some val)
-  | e::k => Node v ( fun x => if A.eq x e then put (Leaf None) k val else (Leaf None))
-  end
-|Node v r => match key with
-  [] => Node (Some val) r
-  | e::k => Node v (fun x => if A.eq x e then put (r e) k val else r e)
-  end
-end.
+    Fixpoint put t key val :=
+      match t with
+        | Leaf v =>
+            match key with
+              | [] => Leaf (Some val)
+              | e::k =>
+                  let t' := put (Leaf None) k val in
+                  Node v ( fun x => if A.eq x e then t' else (Leaf None))
+            end
+        | Node v r =>
+            match key with
+              | [] => Node (Some val) r
+              | e::k =>
+                  let t' := put (r e) k val in
+                  Node v (fun x => if A.eq x e then t' else r e)
+            end
+      end.
 
-Fixpoint get t key val :=
-  match t with 
-Leaf v => match key with 
-  [] => getValue v val
-  | e::k => val
-  end
-|Node v r => match key with
-  [] => getValue v val
-  | e::k => get (r e) k val
-  end
-end.
+    Fixpoint get t key val :=
+      match t with
+        | Leaf v =>
+            match key with 
+              | [] => getValue v val
+              | e::k => val
+            end
+        | Node v r =>
+            match key with
+              | [] => getValue v val
+              | e::k => get (r e) k val
+            end
+      end.
 
    (* Fixpoint put t key val :=
       match key with
@@ -157,18 +165,20 @@ end.
         | e::l, Node _ r => member (r e) l
       end. *)
 
-Fixpoint member t key :=
-match key with 
-| [] => match t with 
-        | Leaf None
-        | Node None _ => false
-        | _ => true
-        end
-| e::k => match t with 
-          | Leaf _=> false
-          | Node _ r => member (r e) k
-        end
-end.
+    Fixpoint member t key :=
+      match key with 
+      | [] =>
+          match t with 
+            | Leaf None
+            | Node None _ => false
+            | _ => true
+          end
+      | e::k =>
+          match t with 
+            | Leaf _=> false
+            | Node _ r => member (r e) k
+          end
+      end.
 
 
     Theorem empty_mem: forall key, member empty key = false.
