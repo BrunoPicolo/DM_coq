@@ -211,10 +211,13 @@ end.
     destruct t; try tauto.
     simpl.
     destruct t; try tauto.
-   simpl.
+    destruct val0; try tauto.
+    simpl.
     destruct key2; try tauto.
     destruct A.eq; try tauto.
+    intros.
     rewrite IHkey1.
+    apply empty_mem.
     rewrite e.
     intros.
     simpl.
