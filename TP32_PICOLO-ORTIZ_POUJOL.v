@@ -18,11 +18,11 @@ Parameter member: table -> Key -> bool.
 Axiom get_empty: forall key def, get empty key def = def.
 Axiom get_put_eq: forall key val def t, get (put t key val) key def = val.
 Axiom get_put_neq: forall key1 key2 val def t,
-key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
+    key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
 Axiom empty_mem: forall key, member empty key = false.
 Axiom mem_put_eq: forall key val t, member (put t key val) key = true.
 Axiom mem_put_neq: forall key1 key2 val t,
-key1<>key2 -> member (put t key1 val) key2 = member t key2.
+    key1<>key2 -> member (put t key1 val) key2 = member t key2.
 End TABLE.
 
 Require Import Ascii. (* pour utiliser des caractères *)
@@ -54,6 +54,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     Inductive trie :=
         Leaf (val: option Val)
       | Node (val: option Val) (reste: A.lettre -> trie).
+
     Definition table := trie.
     Definition empty := Leaf None.
     Definition isDefined T (v: option T) := (* teste si v <> None *)
@@ -61,6 +62,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
           None => false
         | _ => true
       end.
+
     Definition getValue T (v: option T) def := (* valeur dans Some, def sinon *)
       match v with
           None => def
@@ -88,7 +90,7 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     Fixpoint get t key val :=
       match t with
         | Leaf v =>
-            match key with 
+            match key with
               | [] => getValue v val
               | e::k => val
             end
@@ -101,15 +103,15 @@ Module Trie (A:ALPHA) (T:TYPE) <:
 
 
     Fixpoint member t key :=
-      match key with 
+      match key with
       | [] =>
-          match t with 
+          match t with
             | Leaf None
             | Node None _ => false
             | _ => true
           end
       | e::k =>
-          match t with 
+          match t with
             | Leaf _=> false
             | Node _ r => member (r e) k
           end
