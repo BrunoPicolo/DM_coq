@@ -190,6 +190,19 @@ end.
     rewrite IHkey. auto.
     Qed.
 
+    Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
+    Proof.
+    induction key. 
+    destruct t; try tauto.
+    destruct t; try tauto.
+    simpl.
+    destruct A.eq; try tauto.
+    rewrite IHkey; try tauto.
+    simpl.
+    destruct A.eq; try tauto.
+    rewrite IHkey; try tauto.
+    Qed.
+
     Theorem mem_put_neq: forall key1 key2 val t,
       key1<>key2 -> member (put t key1 val) key2 = member t key2.
     Proof.
@@ -214,21 +227,20 @@ end.
     Proof.
     induction key1.
     destruct t; try tauto.
-  
+    simpl.
+    intros.
+    destruct key2; try tauto.
+    intros.
+    destruct key2; try tauto.
+    intros.
+    destruct t; try tauto.
+    simpl.
+    destruct key2; try tauto.
+    destruct A.eq; try tauto.
+    rewrite IHkey1.
+    apply get_empty.
+    intro.
     Admitted.
-
-    Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
-    Proof.
-    induction key. 
-    destruct t; try tauto.
-    destruct t; try tauto.
-    simpl.
-    destruct A.eq; try tauto.
-    rewrite IHkey; try tauto.
-    simpl.
-    destruct A.eq; try tauto.
-    rewrite IHkey; try tauto.
-    Qed.
 End Trie.
 
 Inductive option T :=
