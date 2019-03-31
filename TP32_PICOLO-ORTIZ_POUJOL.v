@@ -99,71 +99,6 @@ Module Trie (A:ALPHA) (T:TYPE) <:
             end
       end.
 
-   (* Fixpoint put t key val :=
-      match key with
-        | []    =>
-            match t with
-              | Leaf _ => Leaf (Some val)
-              | Node _ r => Node (Some val) r
-            end
-        | e::[] =>
-            match t with
-              | Leaf x   => Node x (fun c => if A.eq e c then Leaf (Some val) else Leaf None)
-              | Node x r => Node x (fun c => if A.eq e c then Leaf (Some val) else r c)
-            end
-        | e::l  =>
-            match t with
-              | Leaf x   =>
-                  let t' := put (Leaf None) l val in
-                  Node x (fun c => if A.eq e c then t' else Leaf None)
-              | Node x r =>
-                  let t' := put (r e) l val in
-                  Node x (fun c => if A.eq e c then t' else r c)
-            end
-      end. *)
-
-
-(*     Fixpoint get t key val :=
-      match key with
-        | []    =>
-            match t with
-              | Leaf (Some x)
-              | Node (Some x) _ => x
-              | Leaf None
-              | Node None _     => val
-            end
-        | e::[] =>
-            match t with
-              | Leaf _ => val
-              | Node _ r =>
-                  match r e with
-                    | Leaf (Some x)
-                    | Node (Some x) _ => x
-                    | Leaf None
-                    | Node None _     => val
-                  end
-            end
-        | e::l  =>
-            match t with
-              | Leaf _   => val
-              | Node _ r => get (r e) l val
-            end
-      end. *)
-
-(*     Fixpoint member t key :=
-      match key, t with
-        | [], Leaf (Some _) => true
-        | _, Leaf _ => false
-        | [], Node (Some _) _ => true
-        | [], Node None _     => false
-        | e::[], Node _ r =>
-            match r e with
-              | Leaf (Some x)
-              | Node (Some x) _ => true
-              | _               => false
-            end
-        | e::l, Node _ r => member (r e) l
-      end. *)
 
     Fixpoint member t key :=
       match key with 
@@ -229,12 +164,16 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     destruct t; try tauto.
     simpl.
     destruct t; try tauto.
+    destruct (A.eq a a); try tauto.
     destruct val0.
-    simpl.
     destruct key2; try tauto.
+    simpl.
     destruct A.eq; try tauto.
-    destruct key1; try tauto.
-    destruct key2; try tauto
+    rewrite IHkey1; try tauto.
+    destruct key2; try tauto.
+    intro.
+    subst key1.
+    subst l.
     Admitted.
 
 
@@ -252,11 +191,11 @@ Module Trie (A:ALPHA) (T:TYPE) <:
     destruct val0; try tauto.
     simpl.
     destruct A.eq; try tauto.
+    subst l.
     rewrite IHkey1; try tauto.
-    rewrite e; try tauto.
-    simpl.
+    intros.
     destruct key2; try tauto.
-    discriminate.
+    intro.
     Admitted.
 End Trie.
 
@@ -278,3 +217,4 @@ Module TrieStrNat := Trie StrK NatV.
 Module TestTrieStrNat := Test TrieStrNat.
 
 Eval compute in TestTrieStrNat.test.
+
