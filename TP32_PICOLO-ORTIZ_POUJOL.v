@@ -117,7 +117,13 @@ end.
 
 (*     Fixpoint get t key val :=
       match key with
-        | []    => val (* cle vide, on retourne la valeur alternative *)
+        | []    =>
+            match t with
+              | Leaf (Some x)
+              | Node (Some x) _ => x
+              | Leaf None
+              | Node None _     => val
+            end
         | e::[] =>
             match t with
               | Leaf _ => val
@@ -218,12 +224,8 @@ end.
     intros.
     rewrite IHkey1.
     apply empty_mem.
-    rewrite e.
-    intros.
-    simpl.
-    destruct key2; try tauto.
-    
     Admitted.
+
 
      Theorem get_put_neq: forall key1 key2 val def t,
     key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
