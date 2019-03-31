@@ -67,14 +67,31 @@ Module Trie (A:ALPHA) (T:TYPE) <:
         | Some u => u
       end.
 
-(* Fixpoint put t key val :=
+Fixpoint put t key val := 
 match t with 
-| Leaf _   => 
-    match key with
-    | [] => Leaf (Somme val)
-| Node x r => *)
+Leaf v => match key with 
+  [] => Leaf (Some val)
+  | e::k => Node v ( fun x => if A.eq x e then put (Leaf None) k val else (Leaf None))
+  end
+|Node v r => match key with
+  [] => Node (Some val) r
+  | e::k => Node v (fun x => if A.eq x e then put (r e) k val else r e)
+  end
+end.
 
-    Fixpoint put t key val :=
+Fixpoint get t key val :=
+  match t with 
+Leaf v => match key with 
+  [] => getValue v val
+  | e::k => val
+  end
+|Node v r => match key with
+  [] => getValue v val
+  | e::k => get (r e) k val
+  end
+end.
+
+   (* Fixpoint put t key val :=
       match key with
         | []    =>
             match t with
@@ -95,9 +112,10 @@ match t with
                   let t' := put (r e) l val in
                   Node x (fun c => if A.eq e c then t' else r c)
             end
-      end.
+      end. *)
 
-    Fixpoint get t key val :=
+
+(*     Fixpoint get t key val :=
       match key with
         | []    => val (* cle vide, on retourne la valeur alternative *)
         | e::[] =>
@@ -116,9 +134,9 @@ match t with
               | Leaf _   => val
               | Node _ r => get (r e) l val
             end
-      end.
+      end. *)
 
-    Fixpoint member t key :=
+(*     Fixpoint member t key :=
       match key, t with
         | [], Leaf (Some _) => true
         | _, Leaf _ => false
@@ -131,60 +149,86 @@ match t with
               | _               => false
             end
         | e::l, Node _ r => member (r e) l
-      end.
+      end. *)
+
+Fixpoint member t key :=
+match key with 
+| [] => match t with 
+        | Leaf None
+        | Node None _ => false
+        | _ => true
+        end
+| e::k => match t with 
+          | Leaf _=> false
+          | Node _ r => member (r e) k
+        end
+end.
+
 
     Theorem empty_mem: forall key, member empty key = false.
     Proof.
     destruct key; try tauto.
-    simpl.
-    destruct key; try tauto.
     Qed.
+    Print empty_mem.
 
-    (* Lemma put_empty_key: forall val t, put t [] val = t.
+    Theorem get_empty: forall key def, get empty key def = def.
     Proof.
-    auto.
-    Qed. *)
+    destruct key; try tauto. 
+    Qed.
+    Print get_empty.
 
     Theorem mem_put_eq: forall key val t, member (put t key val) key = true.
     Proof.
     induction key.
     destruct t; try tauto.
-    destruct (A.eq a a).
-    Admitted.
-
-    Theorem get_empty: forall key def, get empty key def = def.
-    destruct key; try tauto.
-    destruct key; try tauto.
+    destruct t; try tauto.
+    simpl.
+    destruct A.eq; try tauto.
+    rewrite IHkey. auto.
+    simpl.
+    destruct A.eq; try tauto.
+    rewrite IHkey. auto.
     Qed.
 
     Theorem mem_put_neq: forall key1 key2 val t,
       key1<>key2 -> member (put t key1 val) key2 = member t key2.
+    Proof.
     induction key1.
     destruct key2; try tauto.
-    destruct t.
-    destruct val0.
-    reflexivity.
-    reflexivity.
-    reflexivity.
-    destruct (A.eq a a).
+    destruct t; try tauto.
+    simpl.
+    destruct t; try tauto.
+   simpl.
+    destruct key2; try tauto.
+    destruct A.eq; try tauto.
+    rewrite IHkey1.
+    rewrite e.
+    intros.
+    simpl.
+    destruct key2; try tauto.
+    
+    Admitted.
+
+     Theorem get_put_neq: forall key1 key2 val def t,
+    key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
+    Proof.
+    induction key1.
+    destruct t; try tauto.
+  
     Admitted.
 
     Theorem get_put_eq: forall key val def t, get (put t key val) key def = val.
     Proof.
     induction key. 
-    destruct t.    
-    simpl. 
-    (*Destruction de l'égalité*)
-    (*utiliser rewrite*)
-    Admitted.
-
-    Theorem get_put_neq: forall key1 key2 val def t,
-    key1<>key2 -> get (put t key1 val) key2 def = get t key2 def.
-    Proof.
-    induction key1.
-    destruct key2.
-    Admitted.
-
+    destruct t; try tauto.
+    destruct t; try tauto.
+    simpl.
+    destruct A.eq; try tauto.
+    rewrite IHkey; try tauto.
+    simpl.
+    destruct A.eq; try tauto.
+    rewrite IHkey; try tauto.
+    Qed.
 End Trie.
 
 Inductive option T :=
